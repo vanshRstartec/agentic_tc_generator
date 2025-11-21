@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic Test Case Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #001333;
+            padding: 15px 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .header img {
+            height: 50px;
+        }
+
+        .header-title {
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #013369;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-content {
+            padding-top: 15px;
+        }
+
+        .section-content.collapsed {
+            display: none;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            color: #013369;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #013369;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .file-upload {
+            border: 2px dashed #013369;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #f0f4ff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-upload:hover {
+            background: #e6edff;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload-label {
+            color: #013369;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            color: #013369;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: #001333;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-primary:not(:disabled):active {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background-color: #013369;
+            color: white;
+        }
+
+        .btn-secondary:not(:disabled):active {
+            opacity: 0.9;
+        }
+
+        .console-log {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #013369;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .long-text-cell {
+            max-height: 100px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .success-msg {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .warning-msg {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid #ffeaa7;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            flex: 1;
+        }
+
+        .spinner {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #013369;
+            font-size: 16px;
+        }
+
+        .spinner.active {
+            display: block;
+        }
+
+        .user-manual {
+            line-height: 1.8;
+        }
+
+        .user-manual h3 {
+            color: #013369;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .user-manual table {
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .user-manual td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .user-manual th {
+            background-color: #f0f4ff;
+            color: #013369;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="data:image/png;base64,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" alt="Logo">
+            <div class="header-title">Agentic Test Case Generator</div>
+        </div>
+
+        <!-- Excel Template Section -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection('template')">
+                <div class="section-title">
+                    📤 Excel Template
+                </div>
+                <span class="toggle-icon expanded" id="template-icon">▼</span>
+            </div>
+            <div class="section-content" id="template-content">
+                <p>Download the Excel template, fill it in, and upload to generate test cases.</p>
+                <button class="btn btn-secondary" onclick="downloadTemplate()">📥 Download Excel Template</button>
+            </div>
+        </div>
+
+        <!-- Azure DevOps Configuration -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection('ado')">
+                <div class="section-title">
+                    ⚙️ Azure DevOps Configuration
+                </div>
+                <span class="toggle-icon" id="ado-icon">▼</span>
+            </div>
+            <div class="section-content collapsed" id="ado-content">
+                <p style="margin-bottom: 15px;">Configure your Azure DevOps settings to upload test cases automatically.</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="ado-org">Organization</label>
+                        <input type="text" id="ado-org" value="exelontfs">
+                    </div>
+                    <div class="form-group">
+                        <label for="ado-project">Project</label>
+                        <input type="text" id="ado-project" value="Gen AI Platform">
+                    </div>
+                    <div class="form-group">
+                        <label for="ado-plan">Test Plan Name</label>
+                        <input type="text" id="ado-plan" value="ASAT">
+                    </div>
+                    <div class="form-group">
+                        <label for="ado-suite">Test Suite Name</label>
+                        <input type="text" id="ado-suite" value="LOGIN">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ado-pat">Personal Access Token (PAT)</label>
+                    <input type="password" id="ado-pat">
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="upload-to-ado" onchange="updateUploadCheckbox()">
+                    <label for="upload-to-ado" style="margin: 0;">Upload test cases to Azure DevOps</label>
+                </div>
+                <div id="ado-warning" class="warning-msg" style="display: none; margin-top: 10px;">
+                    ⚠️ Please fill in all ADO configuration fields to enable upload option.
+                </div>
+            </div>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="section">
+            <div class="file-upload" onclick="document.getElementById('file-input').click()">
+                <input type="file" id="file-input" accept=".xlsx" onchange="handleFileSelect(event)">
+                <div class="file-upload-label">📁 Upload Excel File</div>
+                <div class="file-name" id="file-name"></div>
+            </div>
+            <button class="btn btn-primary" id="generate-btn" onclick="generateTestCases()" disabled>
+                🚀 Generate Test Cases
+            </button>
+        </div>
+
+        <!-- Spinner -->
+        <div class="spinner" id="spinner">
+            🔄 Generating test cases...
+        </div>
+
+        <!-- Console Log Section -->
+        <div class="section" id="console-section" style="display: none;">
+            <div class="section-header" onclick="toggleSection('console')">
+                <div class="section-title">
+                    📋 Console Log
+                </div>
+                <span class="toggle-icon expanded" id="console-icon">▼</span>
+            </div>
+            <div class="section-content" id="console-content">
+                <div class="console-log" id="console-log"></div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="section" id="results-section" style="display: none;">
+            <div class="section-header" onclick="toggleSection('results')">
+                <div class="section-title">
+                    ✅ Test Case Results
+                </div>
+                <span class="toggle-icon expanded" id="results-icon">▼</span>
+            </div>
+            <div class="section-content" id="results-content">
+                <div class="success-msg" id="success-msg"></div>
+                <div class="table-container" id="table-container"></div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="downloadResults()">
+                        📦 Download Generated Test Cases
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateTestCases()">
+                        🔁 Regenerate Test Cases
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Manual Section -->
+        <div class="section">
+            <div class="section-header" onclick="toggleSection('manual')">
+                <div class="section-title">
+                    📘 User Manual
+                </div>
+                <span class="toggle-icon expanded" id="manual-icon">▼</span>
+            </div>
+            <div class="section-content user-manual" id="manual-content">
+                <h1 style="font-size: 30px; color: #013369;">🚀 Getting Started with Agentic Test Case Generator</h1>
+                <p>Welcome to the Agentic Test Case Generator by <strong>rSTAR Technologies</strong> – your AI-powered assistant for fast, smart, and structured test case generation. Follow these steps to make the most out of the tool:</p>
+
+                <h3>📁 Step 1: Download Excel Template & Prepare Your Input Excel File</h3>
+                <p>Your Excel sheet should contain the following <strong>mandatory columns</strong>:</p>
+                <ul>
+                    <li><strong>User Story</strong> e.g., <em>"As a user, I want to reset my password via email."</em></li>
+                    <li><strong>Acceptance Criteria</strong> e.g., "User should receive a reset link when a valid email is entered"</li>
+                </ul>
+                <p>You can optionally include these additional columns to enhance test case accuracy and relevance:</p>
+                <table>
+                    <tr>
+                        <th>Column Name</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>Priority</td>
+                        <td>High / Medium / Low</td>
+                    </tr>
+                    <tr>
+                        <td>Feature/Module</td>
+                        <td>Functional area</td>
+                    </tr>
+                    <tr>
+                        <td>Preconditions</td>
+                        <td>Any setup needed</td>
+                    </tr>
+                    <tr>
+                        <td>Generic Test Data</td>
+                        <td>Sample input</td>
+                    </tr>
+                    <tr>
+                        <td>Test Environment</td>
+                        <td>Browser, OS, device</td>
+                    </tr>
+                    <tr>
+                        <td>Risk Level</td>
+                        <td>Risk category</td>
+                    </tr>
+                    <tr>
+                        <td>Comments/Notes</td>
+                        <td>Additional context</td>
+                    </tr>
+                </table>
+
+                <h3>🧩 Step 2: Formatting Tips</h3>
+                <p><strong>✅ Recommended Format:</strong></p>
+                <table>
+                    <tr>
+                        <th>User Story</th>
+                        <th>Acceptance Criteria</th>
+                    </tr>
+                    <tr>
+                        <td>As a user, I want to reset my password</td>
+                        <td>User should receive a reset link on valid email</td>
+                    </tr>
+                    <tr>
+                        <td>As a user, I want to reset my password</td>
+                        <td>Error shown when email field is empty</td>
+                    </tr>
+                </table>
+
+                <h3>⚙️ Step 3: Upload & Generate</h3>
+                <ul>
+                    <li>Go to the <strong>Upload Excel</strong> section.</li>
+                    <li>Click <em>Browse files</em> and select your Excel file.</li>
+                    <li>Click <em>Generate Test Cases</em>.</li>
+                </ul>
+
+                <h3>📤 Output Format</h3>
+                <p>Your generated test cases will include: S.No., User Story, Acceptance Criteria, Test Type, Test Case Title, Steps, Expected Result, Input Data, Priority, Status, Comments</p>
+
+                <h3>💬 Need Help?</h3>
+                <p>Reach out to the <strong>rSTAR QA Team</strong> for assistance.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Try to connect to Flask backend, fallback to relative paths
+        const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:5000/api'
+            : '/api';
+
+        let uploadedFile = null;
+        let uploadedFilename = null;
+        let generatedData = null;
+        let outputFilename = null;
+
+        // Test backend connection on page load
+        async function testBackendConnection() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+                const data = await response.json();
+                console.log('✅ Backend connected:', data);
+                return true;
+            } catch (error) {
+                console.error('❌ Backend connection failed:', error);
+                alert('⚠️ Cannot connect to backend server. Please ensure Flask is running on http://127.0.0.1:5000');
+                return false;
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            testBackendConnection();
+        });
+
+        function toggleSection(sectionId) {
+            const content = document.getElementById(sectionId + '-content');
+            const icon = document.getElementById(sectionId + '-icon');
+            content.classList.toggle('collapsed');
+            icon.classList.toggle('expanded');
+        }
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedFile = file;
+                document.getElementById('file-name').textContent = `Uploading: ${file.name}`;
+                document.getElementById('generate-btn').disabled = true;
+
+                // Upload file to backend
+                const formData = new FormData();
+                formData.append('file', file);
+
+                try {
+                    console.log('Uploading file to:', `${API_BASE_URL}/upload`);
+                    const response = await fetch(`${API_BASE_URL}/upload`, {
+                        method: 'POST',
+                        mode: 'cors',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        uploadedFilename = data.filename;
+                        document.getElementById('file-name').textContent = `✅ ${file.name}`;
+                        document.getElementById('generate-btn').disabled = false;
+                        updateGenerateButtonText();
+                        console.log('File uploaded successfully:', data.filename);
+                    } else {
+                        throw new Error(data.error || 'Upload failed');
+                    }
+                } catch (error) {
+                    console.error('Upload error:', error);
+                    alert(`Error uploading file: ${error.message}\n\nPlease ensure:\n1. Flask backend is running (python app.py)\n2. Backend is accessible at ${API_BASE_URL}`);
+                    document.getElementById('file-name').textContent = '';
+                    uploadedFile = null;
+                    uploadedFilename = null;
+                }
+            }
+        }
+
+        function updateUploadCheckbox() {
+            const org = document.getElementById('ado-org').value;
+            const project = document.getElementById('ado-project').value;
+            const plan = document.getElementById('ado-plan').value;
+            const suite = document.getElementById('ado-suite').value;
+            const pat = document.getElementById('ado-pat').value;
+            const checkbox = document.getElementById('upload-to-ado');
+            const warning = document.getElementById('ado-warning');
+
+            const configComplete = org && project && plan && suite && pat;
+
+            if (checkbox.checked && !configComplete) {
+                warning.style.display = 'block';
+                checkbox.checked = false;
+            } else {
+                warning.style.display = 'none';
+            }
+
+            updateGenerateButtonText();
+        }
+
+        function updateGenerateButtonText() {
+            const checkbox = document.getElementById('upload-to-ado');
+            const btn = document.getElementById('generate-btn');
+            if (checkbox.checked) {
+                btn.textContent = '🚀 Generate and Upload Test Cases';
+            } else {
+                btn.textContent = '🚀 Generate Test Cases';
+            }
+        }
+
+        function addConsoleLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const log = document.getElementById('console-log');
+            log.textContent += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function downloadTemplate() {
+            try {
+                addConsoleLog('Downloading template...');
+                console.log('Fetching template from:', `${API_BASE_URL}/download-template`);
+
+                const response = await fetch(`${API_BASE_URL}/download-template`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'test_case_template.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                addConsoleLog('✅ Template downloaded successfully');
+                console.log('Template downloaded successfully');
+            } catch (error) {
+                console.error('Template download error:', error);
+                alert(`Error downloading template: ${error.message}\n\nPlease ensure Flask backend is running.`);
+            }
+        }
+
+        async function generateTestCases() {
+            if (!uploadedFilename) {
+                alert('Please upload a file first');
+                return;
+            }
+
+            // Show spinner and hide results
+            document.getElementById('spinner').classList.add('active');
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('console-section').style.display = 'block';
+            document.getElementById('console-log').textContent = '';
+
+            addConsoleLog('Starting test case generation...');
+            addConsoleLog(`Processing file: ${uploadedFile.name}`);
+
+            let uploadToAdo = document.getElementById('upload-to-ado').checked;
+            const adoConfig = {
+                organization: document.getElementById('ado-org').value,
+                project: document.getElementById('ado-project').value,
+                planName: document.getElementById('ado-plan').value,
+                suiteName: document.getElementById('ado-suite').value,
+                pat: document.getElementById('ado-pat').value
+            };
+
+            if (uploadToAdo) {
+                addConsoleLog(`✅ Connecting to Azure DevOps: ${adoConfig.organization}/${adoConfig.project}`);
+                uploadToAdo = "True";
+            } else {
+                uploadToAdo = "False"
+            }
+
+            try {
+                console.log('Generating test cases...');
+                console.log('POST to:', `${API_BASE_URL}/generate`);
+                console.log('Payload:', { filename: uploadedFilename, uploadToAdo });
+
+
+                const response = await fetch(`${API_BASE_URL}/generate`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: uploadedFilename,
+                        adoConfig: adoConfig,
+                        uploadToAdo: uploadToAdo
+                    })
+                });
+
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Generation failed');
+                }
+
+                generatedData = data.testCases;
+                outputFilename = data.outputFilename;
+
+                addConsoleLog(`✅ Generated ${generatedData.length} test cases successfully!`);
+                console.log('Generated test cases:', generatedData.length);
+
+                if (data.uploadedToAdo) {
+                    addConsoleLog('✅ Test cases uploaded to Azure DevOps successfully!');
+                }
+
+                // Hide spinner and show results
+                document.getElementById('spinner').classList.remove('active');
+                displayResults(uploadToAdo);
+
+            } catch (error) {
+                console.error('Generation error:', error);
+                document.getElementById('spinner').classList.remove('active');
+                addConsoleLog(`❌ Error: ${error.message}`);
+                alert(`Error generating test cases: ${error.message}\n\nPlease check:\n1. Flask backend is running\n2. Azure OpenAI credentials are configured\n3. Input file format is correct`);
+            }
+        }
+
+        function displayResults(uploadedToAdo = false) {
+            const resultsSection = document.getElementById('results-section');
+            const tableContainer = document.getElementById('table-container');
+            const successMsg = document.getElementById('success-msg');
+
+            if (uploadedToAdo) {
+                successMsg.textContent = '✅ Test cases generated and uploaded to Azure DevOps successfully!';
+            } else {
+                successMsg.textContent = '✅ Test cases generated successfully!';
+            }
+
+            // Generate table HTML
+            if (generatedData && generatedData.length > 0) {
+                let html = '<table><thead><tr>';
+                const headers = Object.keys(generatedData[0]);
+                headers.forEach(header => {
+                    html += `<th>${header}</th>`;
+                });
+                html += '</tr></thead><tbody>';
+
+                generatedData.forEach(row => {
+                    html += '<tr>';
+                    headers.forEach(header => {
+                        const cellValue = row[header] !== null && row[header] !== undefined ? row[header] : '';
+                        html += `<td><div class="long-text-cell">${cellValue}</div></td>`;
+                    });
+                    html += '</tr>';
+                });
+                html += '</tbody></table>';
+
+                tableContainer.innerHTML = html;
+            }
+
+            resultsSection.style.display = 'block';
+        }
+
+        async function downloadResults() {
+            if (!outputFilename) {
+                alert('No results to download');
+                return;
+            }
+
+            try {
+                addConsoleLog('Downloading generated test cases...');
+                console.log('Downloading from:', `${API_BASE_URL}/download-results/${outputFilename}`);
+
+                const response = await fetch(`${API_BASE_URL}/download-results/${outputFilename}`, {
+                    method: 'GET',
+                    mode: 'cors'
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'generated_test_cases.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+                addConsoleLog('✅ Results downloaded successfully');
+                console.log('Results downloaded successfully');
+            } catch (error) {
+                console.error('Download results error:', error);
+                alert(`Error downloading results: ${error.message}`);
+            }
+        }
+
+        async function regenerateTestCases() {
+            if (!uploadedFilename) {
+                alert('Please upload a file first');
+                return;
+            }
+
+            // Show spinner and reset console
+            document.getElementById('spinner').classList.add('active');
+            document.getElementById('results-section').style.display = 'none';
+            document.getElementById('console-log').textContent = '';
+
+            addConsoleLog('🔁 Regenerating test cases...');
+
+            const uploadToAdo = document.getElementById('upload-to-ado').checked;
+            const adoConfig = {
+                organization: document.getElementById('ado-org').value,
+                project: document.getElementById('ado-project').value,
+                planName: document.getElementById('ado-plan').value,
+                suiteName: document.getElementById('ado-suite').value,
+                pat: document.getElementById('ado-pat').value
+            };
+
+            try {
+                console.log('Regenerating test cases...');
+                console.log('POST to:', `${API_BASE_URL}/regenerate`);
+
+                const response = await fetch(`${API_BASE_URL}/regenerate`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: uploadedFilename,
+                        adoConfig: adoConfig,
+                        uploadToAdo: uploadToAdo
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Regeneration response:', data);
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Regeneration failed');
+                }
+
+                generatedData = data.testCases;
+                outputFilename = data.outputFilename;
+
+                addConsoleLog(`✅ Regenerated ${generatedData.length} test cases successfully!`);
+
+                if (data.uploadedToAdo) {
+                    addConsoleLog('✅ Test cases uploaded to Azure DevOps successfully!');
+                }
+
+                // Hide spinner and show results
+                document.getElementById('spinner').classList.remove('active');
+
+                const successMsg = document.getElementById('success-msg');
+                successMsg.textContent = '🔁 Test cases have been regenerated successfully!';
+
+                displayResults(uploadToAdo);
+
+            } catch (error) {
+                console.error('Regeneration error:', error);
+                document.getElementById('spinner').classList.remove('active');
+                addConsoleLog(`❌ Error: ${error.message}`);
+                alert(`Error regenerating test cases: ${error.message}`);
+            }
+        }
+
+        // Add event listeners for ADO configuration fields
+        document.getElementById('ado-org').addEventListener('input', updateUploadCheckbox);
+        document.getElementById('ado-project').addEventListener('input', updateUploadCheckbox);
+        document.getElementById('ado-plan').addEventListener('input', updateUploadCheckbox);
+        document.getElementById('ado-suite').addEventListener('input', updateUploadCheckbox);
+        document.getElementById('ado-pat').addEventListener('input', updateUploadCheckbox);
+        document.getElementById('upload-to-ado').addEventListener('change', updateGenerateButtonText);
+    </script>
+</body>
+</html>
