@@ -95,7 +95,10 @@ Steps:
 {{'action': '[step action]', 'expected': '[step expected]'}}
 ```
 ---
-Each step must be a dictionary with 'action' and 'expected' keys."""
+Each step must be a dictionary with 'action' and 'expected' keys.
+
+Between each test case there should be a line with only --- to separate them.
+"""
         try:
             response = openai.ChatCompletion.create(engine=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
                                                     messages=[{"role": "system",
