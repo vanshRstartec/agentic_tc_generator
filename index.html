@@ -140,10 +140,10 @@
       </div>
     </details>
 
-    <details>
+    <details open>
       <summary>📘 Excel Template</summary>
       <div class="section-content">
-        <p>Download the Excel template, fill it in, and upload to generate test cases.</p><br>
+        <p>Download the Excel template, fill it in, and upload to generate test cases.</p>
         <button onclick="downloadTemplate()">⬇️ Download Excel Template</button>
         <div id="templateResponse"></div>
       </div>
@@ -223,6 +223,14 @@
     function downloadGeneratedFile() {
       if (!generatedFilename) return;
       window.location.href = `${API_BASE}/download?filename=${encodeURIComponent(generatedFilename)}`;
+    }
+
+    async function downloadTemplate() {
+      const resDiv = document.getElementById('templateResponse');
+      try {
+        window.location.href = `${API_BASE}/download-template`;
+        resDiv.innerHTML = '<div class="response success">✅ Template download started!</div>';
+      } catch (e) { resDiv.innerHTML = `<div class="response error">❌ ${e.message}</div>`; }
     }
 
     async function uploadTestCases() {
