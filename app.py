@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, jsonify, send_file
 import os, pandas as pd, tempfile
 from werkzeug.utils import secure_filename
@@ -72,6 +74,48 @@ def download_template():
         if not os.path.exists('template.xlsx'):
             return jsonify({'status': 'error', 'message': 'Template not found'}), 404
         return send_file('template.xlsx', as_attachment=True, download_name='template.xlsx')
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+from collections import OrderedDict
+
+from collections import OrderedDict
+import pandas as pd, os
+from flask import jsonify, request
+from werkzeug.utils import secure_filename
+
+@app.route('/get-test-cases', methods=['GET'])
+def get_test_cases():
+    try:
+        filename = request.args.get('filename')
+        if not filename:
+            return jsonify({'status': 'error', 'message': 'Filename required'}), 400
+        file_path = os.path.join("output", secure_filename(filename))
+        if not os.path.exists(file_path):
+            return jsonify({'status': 'error', 'message': 'File not found'}), 404
+        df = pd.read_excel(file_path)
+        preferred_order = [
+            'S.No.',
+            'User Story',
+            'Acceptance Criteria',
+            'Title',
+            'Steps',
+            'Priority',
+            'Test Type'
+        ]
+        existing_cols = [c for c in preferred_order if c in df.columns]
+        df = df.where(pd.notnull(df), None)
+        test_cases = []
+        for _, row in df.iterrows():
+            ordered_row = OrderedDict()
+            for col in existing_cols:
+                ordered_row[col] = row[col]
+            test_cases.append(ordered_row)
+        response = {'status': 'success', 'test_cases': test_cases}
+        return app.response_class(
+            response=json.dumps(response, ensure_ascii=False),
+            mimetype='application/json'
+        )
     except Exception as e:
         return jsonify({'status': 'error', 'message': str(e)}), 500
 

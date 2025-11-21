@@ -23,7 +23,7 @@
     header img { height: 40px; }
     header h1 { font-size: 18px; font-weight: 600; }
 
-    .container { max-width: 900px; margin: 30px auto; }
+    .container { max-width: 1100px; margin: 30px auto; }
 
     details {
       background: white;
@@ -80,6 +80,26 @@
     .info { background: #e6f2ff; border: 1px solid #b6dcff; color: #084298; }
 
     .btn-group { display: flex; gap: 10px; align-items: center; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    table th, table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table th { background: #f0f3fa; color: #00163a; position: sticky; top: 0; }
+    .table-container {
+      max-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      margin-top: 10px;
+    }
   </style>
 </head>
 
@@ -91,55 +111,33 @@
 
   <div class="container">
 
-  <details>
+    <!-- User Manual -->
+    <details>
       <summary>📖 User Manual</summary>
       <div class="section-content">
         <h3>🚀 Getting Started with Agentic Test Case Generator</h3>
         <p>Welcome to the Agentic Test Case Generator by <strong>rSTAR Technologies</strong> – your AI-powered assistant for fast, smart, and structured test case generation. Follow these steps to make the most out of the tool:</p>
 
         <h4>📁 Step 1: Download Excel Template & Prepare Your Input Excel File</h4>
-        <p>Your Excel sheet should contain the following mandatory columns:</p>
         <ul>
-          <li><strong>User Story</strong> e.g., “As a user, I want to reset my password via email.”</li>
-          <li><strong>Acceptance Criteria</strong> e.g., “User should receive a reset link when a valid email is entered.”</li>
+          <li><strong>User Story</strong> – e.g., “As a user, I want to reset my password via email.”</li>
+          <li><strong>Acceptance Criteria</strong> – e.g., “User should receive a reset link when a valid email is entered.”</li>
         </ul>
 
-        <p>You can optionally include these additional columns to enhance test case accuracy and relevance:</p>
-
-        <table>
-          <tr><th>Column Name</th><th>Description</th></tr>
-          <tr><td>Priority</td><td>High / Medium / Low</td></tr>
-          <tr><td>Feature/Module</td><td>Functional area</td></tr>
-          <tr><td>Preconditions</td><td>Any setup needed</td></tr>
-          <tr><td>Generic Test Data</td><td>Sample input</td></tr>
-          <tr><td>Test Environment</td><td>Browser, OS, device</td></tr>
-          <tr><td>Risk Level</td><td>Risk category</td></tr>
-          <tr><td>Comments/Notes</td><td>Additional context</td></tr>
-        </table>
-
         <h4>🧩 Step 2: Formatting Tips</h4>
-        <p>✅ <strong>Recommended Format:</strong></p>
         <table>
           <tr><th>User Story</th><th>Acceptance Criteria</th></tr>
           <tr><td>As a user, I want to reset my password</td><td>User should receive a reset link on valid email</td></tr>
-          <tr><td>As a user, I want to reset my password</td><td>Error shown when email field is empty</td></tr>
         </table>
 
         <h4>⚙️ Step 3: Upload & Generate</h4>
         <ul>
-          <li>Go to the <strong>Upload Excel</strong> section.</li>
-          <li>Click <em>Browse files</em> and select your Excel file.</li>
-          <li>Click <strong>Generate Test Cases</strong>.</li>
+          <li>Upload Excel → Generate Test Cases → View results below.</li>
         </ul>
-
-        <h4>📤 Output Format</h4>
-        <p>Your generated test cases will include: S.No., User Story, Acceptance Criteria, Test Type, Test Case Title, Steps, Expected Result, Input Data, Priority, Status, Comments</p>
-
-        <h4>💬 Need Help?</h4>
-        <p>Reach out to the <strong>rSTAR QA Team</strong> for assistance.</p>
       </div>
     </details>
 
+    <!-- Template Section -->
     <details>
       <summary>📘 Excel Template</summary>
       <div class="section-content">
@@ -149,8 +147,9 @@
       </div>
     </details>
 
-    <details>
-      <summary>⚙️ Generate and Download Test Cases</summary>
+    <!-- Generate Section -->
+    <details open>
+      <summary>⚙️ Generate and View Test Cases</summary>
       <div class="section-content">
         <div class="form-group">
           <label>Upload Input Excel File</label>
@@ -161,16 +160,15 @@
           <button id="downloadBtn" onclick="downloadGeneratedFile()" disabled>⬇️ Download Test Cases</button>
         </div>
         <div id="generateResponse"></div>
+        <div id="testCasesContainer"></div>
       </div>
     </details>
 
+    <!-- Upload Section -->
     <details>
-      <summary>☁️ Upload to AzureDevOps</summary>
+      <summary>☁️ Upload to Azure DevOps</summary>
       <div class="section-content">
-        <div class="form-group">
-          <label>Upload Generated TCS Excel File</label>
-          <input type="file" id="uploadFile" accept=".xlsx">
-        </div>
+        <div class="form-group"><label>Upload Generated TCS Excel File</label><input type="file" id="uploadFile" accept=".xlsx"></div>
         <div class="form-group"><label>Organization</label><input type="text" id="org" placeholder="e.g., exelontfs"></div>
         <div class="form-group"><label>Project</label><input type="text" id="project" placeholder="e.g., Gen AI Platform"></div>
         <div class="form-group"><label>PAT Token</label><input type="text" id="pat" placeholder="Your Azure DevOps PAT"></div>
@@ -180,7 +178,6 @@
         <div id="uploadResponse"></div>
       </div>
     </details>
-
   </div>
 
   <script>
@@ -191,7 +188,9 @@
       const fileInput = document.getElementById('generateFile');
       const responseDiv = document.getElementById('generateResponse');
       const downloadBtn = document.getElementById('downloadBtn');
+      const container = document.getElementById('testCasesContainer');
       downloadBtn.disabled = true;
+      container.innerHTML = '';
       if (!fileInput.files[0]) {
         responseDiv.innerHTML = '<div class="response error">Please select a file</div>';
         return;
@@ -199,7 +198,6 @@
 
       const formData = new FormData();
       formData.append('file', fileInput.files[0]);
-
       try {
         responseDiv.innerHTML = '<div class="response info">Generating test cases...</div>';
         const res = await fetch(`${API_BASE}/generate`, { method: 'POST', body: formData });
@@ -208,10 +206,13 @@
         if (data.status === 'success') {
           generatedFilename = data.filename;
           responseDiv.innerHTML = `<div class="response success">
-            ✅ Success! Test Cases Generated: ${data.count}<br>
+            ✅ Success! Generated ${data.count} test cases.<br>
             Filename: <strong>${data.filename}</strong>
           </div>`;
           downloadBtn.disabled = false;
+
+          // Fetch and display test cases
+          await fetchAndShowTestCases(data.filename);
         } else {
           responseDiv.innerHTML = `<div class="response error">❌ ${data.message}</div>`;
         }
@@ -219,6 +220,64 @@
         responseDiv.innerHTML = `<div class="response error">❌ ${e.message}</div>`;
       }
     }
+
+  async function fetchAndShowTestCases(filename) {
+  const container = document.getElementById('testCasesContainer');
+  container.innerHTML = '<div class="response info">📄 Loading test cases...</div>';
+
+  try {
+    const res = await fetch(`${API_BASE}/get-test-cases?filename=${encodeURIComponent(filename)}`);
+    const text = await res.text();
+
+    // Replace invalid NaN tokens
+    const safeText = text.replace(/\bNaN\b/g, 'null');
+    const data = JSON.parse(safeText);
+
+    if (data.status !== 'success') {
+      container.innerHTML = `<div class="response error">❌ ${data.message}</div>`;
+      return;
+    }
+
+    const testCases = data.test_cases;
+    if (!testCases.length) {
+      container.innerHTML = '<div class="response info">No test cases found.</div>';
+      return;
+    }
+
+    // Build table
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const tbody = document.createElement('tbody');
+
+    const columns = Object.keys(testCases[0]);
+    thead.innerHTML = '<tr>' + columns.map(c => `<th>${c}</th>`).join('') + '</tr>';
+
+   testCases.forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = columns.map(c => {
+        let value = row[c];
+        if (value === null || value === undefined || String(value).toLowerCase() === 'nan') {
+          value = '';
+        } else if (c === 'Steps') {
+          // add one blank line between steps
+          value = String(value).replace(/\n/g, '<br><br>');
+        }
+        return `<td>${value}</td>`;
+      }).join('');
+      tbody.appendChild(tr);
+    });
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    container.innerHTML = `<h4 style="margin-top:20px;">📋 Generated Test Cases</h4>
+                           <div class="table-container"></div>`;
+    container.querySelector('.table-container').appendChild(table);
+  } catch (e) {
+    container.innerHTML = `<div class="response error">❌ ${e.message}</div>`;
+  }
+}
+
 
     function downloadGeneratedFile() {
       if (!generatedFilename) return;
